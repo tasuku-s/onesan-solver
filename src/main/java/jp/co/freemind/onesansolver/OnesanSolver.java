@@ -14,9 +14,7 @@ public class OnesanSolver {
   }
 
   public long solve() {
-    boolean[][] visitMap = new boolean[n + 1][n + 1];
-    visitMap[0][0] = true;
-    Visitor visitor = new Visitor(visitMap);
+    Visitor visitor = new Visitor(grid[0][0].getPoint());
     grid[0][1].accept(visitor);
     return visitor.getResult() * 2;
   }

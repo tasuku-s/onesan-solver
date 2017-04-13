@@ -1,15 +1,15 @@
 package jp.co.freemind.onesansolver;
 
 public class Visitor {
-  private final boolean[][] visitMap;
+  private long visitMap;
   private long count = 0;
 
-  public Visitor(boolean[][] visitMap) {
+  public Visitor(long visitMap) {
     this.visitMap = visitMap;
   }
 
   public boolean visit(Node node) {
-    visitMap[node.getX()][node.getY()] = true;
+    visitMap = visitMap | node.getPoint();
 
     if (node.isGoal()) {
       this.count++;
@@ -20,14 +20,14 @@ public class Visitor {
   }
 
   public void leave(Node node) {
-    visitMap[node.getX()][node.getY()] = false;
+    visitMap = visitMap & (~node.getPoint());
   }
 
   public long getResult() {
     return count;
   }
 
-  public boolean isVisitable(int x, int y) {
-    return !visitMap[x][y];
+  public boolean isVisitable(Node node) {
+    return (visitMap & node.getPoint()) == 0;
   }
 }
