@@ -7,7 +7,7 @@ public class OnesanSolver {
   public OnesanSolver(int n) {
     grid = new Node[n + 1][n + 1];
     for (int x = 0; x <= n; x++) for (int y = 0; y <= n; y++) {
-      grid[x][y] = new Node(n, grid, x, y, (x == n && y == n));
+      grid[x][y] = new Node(grid, x, y);
     }
   }
 

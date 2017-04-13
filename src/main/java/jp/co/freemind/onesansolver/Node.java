@@ -1,51 +1,46 @@
 package jp.co.freemind.onesansolver;
 
 public class Node {
-  private final int n;
-  private final Node[][] grid;
-  private final int x;
-  private final int y;
   private final boolean goal;
   private final long point;
 
-  public Node(int n, Node[][] grid, int x, int y, boolean goal) {
-    this.n = n;
-    this.grid = grid;
-    this.x = x;
-    this.y = y;
-    this.goal = goal;
+  private final Index left;
+  private final Index right;
+  private final Index top;
+  private final Index bottom;
+
+  public Node(Node[][] grid, int x, int y) {
+    int n = grid.length - 1;
+    this.goal = n == x && n == y;
     this.point = 1L << (x + (n + 1) * y);
+
+    this.left = x > 0 ? new Index(grid, x - 1, y) : null;
+    this.right = x < n ? new Index(grid, x + 1, y) : null;
+    this.top = y > 0 ? new Index(grid, x, y - 1) : null;
+    this.bottom = y < n ? new Index(grid, x, y + 1) : null;
   }
 
   public long evaluate(long visitMap) {
     if (goal) return 1;
 
-    visitMap = nextVisitMap(visitMap);
-    long count = 0;
-    if (x > 0 && isVisitable(grid[x - 1][y], visitMap)) {
-      count += grid[x - 1][y].evaluate(visitMap);
-    }
-    if (y > 0 && isVisitable(grid[x][y - 1], visitMap)) {
-      count += grid[x][y - 1].evaluate(visitMap);
-    }
-    if (x < n && isVisitable(grid[x + 1][y], visitMap)) {
-      count += grid[x + 1][y].evaluate(visitMap);
-    }
-    if (y < n && isVisitable(grid[x][y + 1], visitMap)) {
-      count += grid[x][y + 1].evaluate(visitMap);
-    }
-    return count;
+    visitMap = nextVisitMap(visitMap, point);
+    return
+      (isVisitable(left, visitMap) ? left.get().evaluate(visitMap) : 0)
+    + (isVisitable(right, visitMap) ? right.get().evaluate(visitMap) : 0)
+    + (isVisitable(top, visitMap) ? top.get().evaluate(visitMap) : 0)
+    + (isVisitable(bottom, visitMap) ? bottom.get().evaluate(visitMap) : 0)
+    ;
   }
 
   public long getPoint() {
     return point;
   }
 
-  private long nextVisitMap(long visitMap) {
+  private static long nextVisitMap(long visitMap, long point) {
     return visitMap | point;
   }
 
-  private static boolean isVisitable(Node node, long visitMap) {
-    return (visitMap & node.getPoint()) == 0;
+  private static boolean isVisitable(Index index, long visitMap) {
+    return index != null && (visitMap & index.get().getPoint()) == 0;
   }
 }
